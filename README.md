@@ -29,7 +29,7 @@ Aplikacja nie wymaga środowiska Node.js ani dodatkowych systemów budowania fro
    cd system_awarii
 
    python -m venv venv
-   # Windows:
+   na Windows:
    .\venv\Scripts\activate
 
    pip install -r requirements.txt
