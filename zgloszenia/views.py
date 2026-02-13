@@ -1,8 +1,33 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_, some_shortcut
 from .models import Zgloszenie
 from .forms import ZgloszenieForm
 from django.contrib.auth.models import User
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
+
+def czy_admin(user):
+    return user.is_staff
+
+@login_required
+@user_passes_test(czy_admin)
+def panel_administratora(request):
+    wszystkie_zgloszenia = Zgloszenie.objects.all().order_by('-data_utworzenia')
+    
+    query = request.GET.get('q')
+    if query:
+        wszystkie_zgloszenia = wszystkie_zgloszenia.filter(tytul__icontains=query)
+
+    return render(request, 'zgloszenia/panel_admina.html',{
+        'zgloszenia': wszystkie_zgloszenia
+    })
+
+@login_required
+@user_passes_test(czy_admin)
+def zmien_status(request, pk, nowy_status):
+    # Pobieramy konkretne zgłoszenie po jego ID (pk)
+    zgloszenie = Zgloszenie.objects.get(pk=pk)
+    zgloszenie.status = nowy_status
+    zgloszenie.save()
+    return redirect('panel_administratora')
 
 def lista_zgloszen(request):
     zgloszenia = Zgloszenie.objects.all().order_by('-data_utworzenia')

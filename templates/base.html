@@ -15,6 +15,11 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'lista_zgloszen' %}">Moje Zgłoszenia</a>
                     </li>
+                    {% if user.is_staff %}
+                    <li class="nav-item">
+                        <a class="nav-link text-warning" href="{% url 'panel_administratora' %}">PANEL IT (ADMIN)</a>
+                    </li>
+                    {% endif %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'nowe_zgloszenie' %}">Zgłoś Awarię</a>
                     </li>
