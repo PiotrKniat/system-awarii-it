@@ -3,41 +3,46 @@
 {% block title %}Lista Zgłoszeń{% endblock %}
 
 {% block content %}
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>Twoje Zgłoszenia</h1>
-        <a href="{% url 'nowe_zgloszenie' %}" class="btn btn-success">+ Nowe Zgłoszenie</a>
-    </div>
-    
-    <table class="table table-hover shadow-sm">
-        <thead class="table-dark">
-            <tr>
-                <th>Tytuł</th>
-                <th>Kategoria</th>
-                <th>Priorytet</th>
-                <th>Status</th>
-                <th>Data</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for z in zgloszenia %}
-            <tr>
-                <td>{{ z.tytul }}</td>
-                <td>{{ z.get_kategoria_display }}</td>
-                <td>
-                    <span class="badge {% if z.priorytet == 'wysoki' %}bg-danger{% else %}bg-info{% endif %}">
-                        {{ z.get_priorytet_display }}
-                    </span>
-                </td>
-                <td>
-                    <span class="badge bg-secondary">{{ z.get_status_display }}</span>
-                </td>
-                <td>{{ z.data_utworzenia|date:"d.m.Y H:i" }}</td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="5" class="text-center">Brak zgłoszeń. Kliknij przycisk powyżej, aby dodać pierwsze!</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Twoje Zgłoszenia</h1>
+    <a href="{% url 'nowe_zgloszenie' %}" class="btn btn-success">+ Nowe Zgłoszenie</a>
+</div>
+
+<table class="table table-hover shadow-sm border">
+    <thead class="table-dark">
+        <tr>
+            <th>Tytuł</th>
+            <th>Kategoria</th>
+            <th>Priorytet</th>
+            <th>Status</th>
+            <th>Data</th>
+            <th>Akcje</th> </tr>
+    </thead>
+    <tbody>
+        {% for z in zgloszenia %}
+        <tr>
+            <td>{{ z.tytul }}</td>
+            <td>{{ z.get_kategoria_display }}</td>
+            <td>
+                <span class="badge {% if z.priorytet == 'wysoki' %}bg-danger{% else %}bg-info{% endif %}">
+                    {{ z.get_priorytet_display }}
+                </span>
+            </td>
+            <td> <span class="badge bg-secondary">{{ z.get_status_display }}</span>
+            </td>
+            <td> {{ z.data_utworzenia|date:"d.m.Y H:i" }}
+            </td>
+            <td> <a href="{% url 'usun_zgloszenie' z.pk %}" class="btn btn-sm btn-outline-danger" 
+                   onclick="return confirm('Czy na pewno chcesz usunąć to zgłoszenie?')">
+                   Usuń
+                </a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="6" class="text-center text-muted p-4">Nie masz jeszcze żadnych zgłoszeń.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 {% endblock %}

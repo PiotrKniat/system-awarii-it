@@ -61,6 +61,8 @@
                 <div class="btn-group">
                     <a href="{% url 'zmien_status' z.pk 'w_trakcie' %}" class="btn btn-sm btn-warning">W trakcie</a>
                     <a href="{% url 'zmien_status' z.pk 'zamkniete' %}" class="btn btn-sm btn-success">Zamknij</a>
+                    <a href="{% url 'usun_zgloszenie' z.pk %}" class="btn btn-sm btn-danger" 
+                        onclick="return confirm('Czy na pewno chcesz trwale usunąć to zgłoszenie?')">Usuń</a>
                 </div>
             </td>
         </tr>

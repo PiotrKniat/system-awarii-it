@@ -89,3 +89,17 @@ def nowe_zgloszenie(request):
         zgloszenie.save()
         return redirect('lista_zgloszen')
     return render(request, 'zgloszenia/formularz.html', {'form': form})
+
+@login_required
+def usun_zgloszenie(request, pk):
+    zgloszenie = get_object_or_404(Zgloszenie, pk=pk)
+    
+    if request.user.is_staff or zgloszenie.autor == request.user:
+        zgloszenie.delete()
+        messages.success(request, "Zgłoszenie zostało pomyślnie usunięte.")
+    else:
+        messages.error(request, "Nie masz uprawnień do usunięcia tego zgłoszenia!")
+    
+    if request.user.is_staff:
+        return redirect('panel_administratora')
+    return redirect('lista_zgloszen')
