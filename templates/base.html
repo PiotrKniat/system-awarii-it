@@ -10,20 +10,24 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
         <div class="container">
             <a class="navbar-brand" href="{% url 'lista_zgloszen' %}">HelpDesk IT</a>
+            
             <div class="collapse navbar-collapse">
                 <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'lista_zgloszen' %}">Moje Zgłoszenia</a>
-                    </li>
-                    {% if user.is_staff %}
-                    <li class="nav-item">
-                        <a class="nav-link text-warning" href="{% url 'panel_administratora' %}">PANEL IT (ADMIN)</a>
-                    </li>
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'lista_zgloszen' %}">Moje Zgłoszenia</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'nowe_zgloszenie' %}">Zgłoś Awarię</a>
+                        </li>
+                        {% if user.is_staff %}
+                        <li class="nav-item">
+                            <a class="nav-link text-warning" href="{% url 'panel_administratora' %}">PANEL IT (ADMIN)</a>
+                        </li>
+                        {% endif %}
                     {% endif %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'nowe_zgloszenie' %}">Zgłoś Awarię</a>
-                    </li>
                 </ul>
+
                 <div class="navbar-nav">
                     {% if user.is_authenticated %}
                         <span class="navbar-text me-3">Zalogowany: <strong>{{ user.username }}</strong></span>
@@ -32,6 +36,7 @@
                             <button type="submit" class="btn btn-outline-light btn-sm">Wyloguj</button>
                         </form>
                     {% else %}
+                        <a class="btn btn-outline-light btn-sm me-2" href="{% url 'rejestracja' %}">Rejestracja</a>
                         <a class="btn btn-outline-light btn-sm" href="{% url 'login' %}">Zaloguj się</a>
                     {% endif %}
                 </div>
@@ -40,6 +45,15 @@
     </nav>
 
     <div class="container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
         {% block content %}
         {% endblock %}
     </div>

@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row align-items-end mb-4">
+    <div class="col-md-7">
+        <label class="form-label fw-bold">Filtruj status:</label>
+        <div class="btn-group d-flex shadow-sm">
+            <a href="?status=&q={{ szukana_fraza }}" 
+               class="btn btn-outline-secondary {% if not wybrany_status %}active{% endif %}">Wszystkie</a>
+            
+            <a href="?status=nowe&q={{ szukana_fraza }}" 
+               class="btn btn-outline-primary {% if wybrany_status == 'nowe' %}active{% endif %}">Nowe</a>
+            
+            <a href="?status=w_trakcie&q={{ szukana_fraza }}" 
+               class="btn btn-outline-warning {% if wybrany_status == 'w_trakcie' %}active{% endif %}">W trakcie</a>
+            
+            <a href="?status=zamkniete&q={{ szukana_fraza }}" 
+               class="btn btn-outline-success {% if wybrany_status == 'zamkniete' %}active{% endif %}">Zamknięte</a>
+        </div>
+    </div>
+
+    <div class="col-md-5">
+        <form method="get" class="d-flex">
+            <input type="hidden" name="status" value="{{ wybrany_status }}">
+            <div class="input-group">
+                <input type="text" name="q" class="form-control" placeholder="Szukaj..." value="{{ szukana_fraza }}">
+                <button class="btn btn-dark" type="submit">Szukaj</button>
+                <a href="{% url 'panel_administratora' %}" class="btn btn-outline-danger">X</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<table class="table table-hover border">
+    <thead class="table-dark">
+        <tr>
+            <th>Autor</th>
+            <th>Temat</th>
+            <th>Status</th>
+            <th>Priorytet</th>
+            <th>Akcje</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for z in zgloszenia %}
+        <tr>
+            <td>{{ z.autor.username }}</td>
+            <td>{{ z.tytul }}</td>
+            <td>
+                <span class="badge 
+                    {% if z.status == 'nowe' %}bg-primary{% elif z.status == 'w_trakcie' %}bg-warning{% else %}bg-success{% endif %}">
+                    {{ z.get_status_display }}
+                </span>
+            </td>
+            <td>
+                <span class="badge {% if z.priorytet == 'wysoki' %}bg-danger{% else %}bg-info{% endif %}">
+                    {{ z.get_priorytet_display }}
+                </span>
+            </td>
+            <td>
+                <div class="btn-group">
+                    <a href="{% url 'zmien_status' z.pk 'w_trakcie' %}" class="btn btn-sm btn-warning">W trakcie</a>
+                    <a href="{% url 'zmien_status' z.pk 'zamkniete' %}" class="btn btn-sm btn-success">Zamknij</a>
+                </div>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="5" class="text-center text-muted p-4">Brak zgłoszeń spełniających kryteria.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
