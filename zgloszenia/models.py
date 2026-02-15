@@ -1,6 +1,14 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+class Sprzet(models.Model):
+    nazwa = models.CharField(max_length=100)
+    numer_seryjny = models.CharField(max_length=50, unique=True)
+    wlasciciel = models.ForeignKey(User, on_delete=models.CASCADE, related_name='zasoby')
+
+    def __str__(self):
+        return f"{self.nazwa} ({self.numer_seryjny})"
+
 class Zgloszenie(models.Model):
 
     KATEGORIE = [
@@ -26,8 +34,14 @@ class Zgloszenie(models.Model):
     priorytet = models.CharField(max_length=20, choices=PRIORYTETY, default='niski')
     status = models.CharField(max_length=20, choices=STATUSY, default='nowe')
     data_utworzenia = models.DateTimeField(auto_now_add=True)
-
     autor = models.ForeignKey(User, on_delete=models.CASCADE)
+    urzadzenie = models.ForeignKey(Sprzet, on_delete=models.SET_NULL, null=True, blank=True)
+
+class Komentarz(models.Model):
+    zgloszenie = models.ForeignKey(Zgloszenie, on_delete=models.CASCADE, related_name='komentarze')
+    autor = models.ForeignKey(User, on_delete=models.CASCADE)
+    tresc = models.TextField()
+    data_dodania = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.tytul} - ({self.status})"

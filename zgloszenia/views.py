@@ -1,10 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Zgloszenie
-from .forms import ZgloszenieForm
+from .forms import KomentarzForm, ZgloszenieForm
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
+
+from zgloszenia import models
 
 def rejestracja(request):
     if request.method == "POST":
@@ -103,3 +105,24 @@ def usun_zgloszenie(request, pk):
     if request.user.is_staff:
         return redirect('panel_administratora')
     return redirect('lista_zgloszen')
+
+def szczegoly_zgloszenia(request, pk):
+    zgloszenie = get_object_or_404(Zgloszenie, pk=pk)
+    komentarze = zgloszenie.komentarze.all()
+
+    if request.method == "POST":
+        form = KomentarzForm(request.POST)
+        if form.is_valid():
+            komentarze = form.save(commit=False)
+            komentarze.zgloszenie = zgloszenie
+            komentarze.autor = request.user
+            komentarze.save()
+            return redirect('szczegoly_zgloszenia', pk=pk)
+    else:
+        form = KomentarzForm()
+
+    return render(request, 'zgloszenia/szczegoly.html', {
+        'zgloszenie': zgloszenie,
+        'komentarze': komentarze,
+        'form': form
+    })
