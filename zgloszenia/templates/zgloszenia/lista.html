@@ -16,23 +16,30 @@
             <th>Priorytet</th>
             <th>Status</th>
             <th>Data</th>
-            <th>Akcje</th> </tr>
+            <th>Akcje</th> 
+        </tr>
     </thead>
     <tbody>
         {% for z in zgloszenia %}
         <tr>
-            <td>{{ z.tytul }}</td>
+            <td>
+                <a href="{% url 'szczegoly_zgloszenia' z.pk %}" class="text-decoration-none fw-bold text-dark">
+                    {{ z.tytul }}
+                </a>
+            </td>
             <td>{{ z.get_kategoria_display }}</td>
             <td>
                 <span class="badge {% if z.priorytet == 'wysoki' %}bg-danger{% else %}bg-info{% endif %}">
                     {{ z.get_priorytet_display }}
                 </span>
             </td>
-            <td> <span class="badge bg-secondary">{{ z.get_status_display }}</span>
+            <td> 
+                <span class="badge bg-secondary">{{ z.get_status_display }}</span>
             </td>
             <td> {{ z.data_utworzenia|date:"d.m.Y H:i" }}
             </td>
-            <td> <a href="{% url 'usun_zgloszenie' z.pk %}" class="btn btn-sm btn-outline-danger" 
+            <td> 
+                <a href="{% url 'usun_zgloszenie' z.pk %}" class="btn btn-sm btn-outline-danger" 
                    onclick="return confirm('Czy na pewno chcesz usunąć to zgłoszenie?')">
                    Usuń
                 </a>

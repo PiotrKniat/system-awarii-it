@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Baza Sprzętu</h1>
+    <a href="{% url 'dodaj_sprzet' %}" class="btn btn-success">+ Dodaj Urządzenie</a>
+</div>
+
+<table class="table table-hover shadow-sm border">
+    <thead class="table-dark">
+        <tr>
+            <th>Nazwa</th>
+            <th>Nr Seryjny</th>
+            <th>Właściciel</th>
+            <th>Akcje</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for s in sprzety %}
+        <tr>
+            <td>{{ s.nazwa }}</td>
+            <td><code>{{ s.numer_seryjny }}</code></td>
+            <td>
+                {% if s.wlasciciel %}
+                    <span class="badge bg-primary">{{ s.wlasciciel.username }}</span>
+                {% else %}
+                    <span class="badge bg-secondary">Magazyn (Wolne)</span>
+                {% endif %}
+            </td>
+            <td>
+                <a href="{% url 'edytuj_sprzet' s.pk %}" class="btn btn-sm btn-warning">Edytuj</a>
+                <a href="{% url 'usun_sprzet' s.pk %}" class="btn btn-sm btn-outline-danger"
+                   onclick="return confirm('Usunąć sprzęt z bazy?')">Usuń</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4" class="text-center">Brak sprzętu w bazie.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

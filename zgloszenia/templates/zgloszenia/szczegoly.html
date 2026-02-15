@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-dark text-white">
+                Szczegóły zgłoszenia #{{ zgloszenie.id }}
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">{{ zgloszenie.tytul }}</h5>
+                <span class="badge bg-secondary mb-3">{{ zgloszenie.get_status_display }}</span>
+                
+                <p><strong>Autor:</strong> {{ zgloszenie.autor.username }}</p>
+                <p><strong>Sprzęt:</strong> 
+                    {% if zgloszenie.urzadzenie %}
+                        <span class="text-primary">{{ zgloszenie.urzadzenie }}</span>
+                    {% else %}
+                        <span class="text-muted">Brak</span>
+                    {% endif %}
+                </p>
+                <p><strong>Opis:</strong><br>{{ zgloszenie.opis }}</p>
+                <hr>
+                <a href="{% url 'lista_zgloszen' %}" class="btn btn-outline-secondary w-100">Wróć do listy</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <h4 class="mb-3">Konwersacja</h4>
+        
+        <div class="list-group mb-4 shadow-sm">
+            {% for kom in komentarze %}
+                <div class="list-group-item {% if kom.autor.is_staff %}list-group-item-warning{% endif %}">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h6 class="mb-1 fw-bold">
+                            {{ kom.autor.username }} 
+                            {% if kom.autor.is_staff %}(Support IT){% endif %}
+                        </h6>
+                        <small class="text-muted">{{ kom.data_dodania|date:"d.m.Y H:i" }}</small>
+                    </div>
+                    <p class="mb-1">{{ kom.tresc }}</p>
+                </div>
+            {% empty %}
+                <div class="alert alert-light text-center">Brak komentarzy. Rozpocznij dyskusję!</div>
+            {% endfor %}
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button type="submit" class="btn btn-primary float-end">Wyślij odpowiedź</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

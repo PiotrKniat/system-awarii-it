@@ -8,4 +8,9 @@ urlpatterns = [
     path('status/<int:pk>/<str:nowy_status>/', views.zmien_status, name='zmien_status'),
     path('register/', views.rejestracja, name='rejestracja'),
     path('usun/<int:pk>/', views.usun_zgloszenie, name='usun_zgloszenie'),
+    path('zgloszenie/<int:pk>/', views.szczegoly_zgloszenia, name='szczegoly_zgloszenia'),
+    path('sprzet/', views.lista_sprzetu, name='lista_sprzetu'),
+    path('sprzet/dodaj/', views.dodaj_sprzet, name='dodaj_sprzet'),
+    path('sprzet/edytuj/<int:pk>/', views.edytuj_sprzet, name='edytuj_sprzet'),
+    path('sprzet/usun/<int:pk>/', views.usun_sprzet, name='usun_sprzet'),
 ]

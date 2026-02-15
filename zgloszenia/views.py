@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Zgloszenie
-from .forms import KomentarzForm, ZgloszenieForm
+from django.http import HttpResponseForbidden
+from .models import Zgloszenie, Komentarz, Sprzet
+from .forms import KomentarzForm, ZgloszenieForm, SprzetForm
 from django.contrib.auth.models import User
-from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.decorators import login_required, user_passes_test, staff_member_required
 from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
 
@@ -65,15 +66,15 @@ def lista_zgloszen(request):
 @login_required
 def nowe_zgloszenie(request):
     if request.method == "POST":
-        form = ZgloszenieForm(request.POST)
+        form = ZgloszenieForm(request.POST, user=request.user)
         if form.is_valid():
             zgloszenie = form.save(commit=False)
-            zgloszenie.autor = User.objects.first() 
+            zgloszenie.autor = request.user
             zgloszenie.save()
             messages.success(request, "Zgłoszenie zostało dodane!")
             return redirect('lista_zgloszen')
     else:
-        form = ZgloszenieForm()
+        form = ZgloszenieForm(user=request.user)
     
     return render(request, 'zgloszenia/formularz.html', {'form': form})
 
@@ -106,23 +107,64 @@ def usun_zgloszenie(request, pk):
         return redirect('panel_administratora')
     return redirect('lista_zgloszen')
 
+@login_required
 def szczegoly_zgloszenia(request, pk):
     zgloszenie = get_object_or_404(Zgloszenie, pk=pk)
-    komentarze = zgloszenie.komentarze.all()
 
-    if request.method == "POST":
+    if request.user != zgloszenie.autor and not request.user.is_staff:
+        return HttpResponseForbidden("Nie masz dostępu do tego zgłoszenia.")
+
+    if request.method == 'POST':
         form = KomentarzForm(request.POST)
         if form.is_valid():
-            komentarze = form.save(commit=False)
-            komentarze.zgloszenie = zgloszenie
-            komentarze.autor = request.user
-            komentarze.save()
+            komentarz = form.save(commit=False)
+            komentarz.zgloszenie = zgloszenie
+            komentarz.autor = request.user
+            komentarz.save()
+            messages.success(request, 'Dodano komentarz.')
             return redirect('szczegoly_zgloszenia', pk=pk)
     else:
         form = KomentarzForm()
 
     return render(request, 'zgloszenia/szczegoly.html', {
         'zgloszenie': zgloszenie,
-        'komentarze': komentarze,
+        'komentarze': zgloszenie.komentarze.all().order_by('data_dodania'),
         'form': form
     })
+
+@staff_member_required
+def lista_sprzetu(request):
+    sprzety = Sprzet.objects.all()
+    return render(request, 'zgloszenia/sprzet_lista.html', {'sprzety': sprzety})
+
+@staff_member_required
+def dodaj_sprzet(request):
+    if request.method == 'POST':
+        form = SprzetForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Dodano nowe urządzenie.")
+            return redirect('lista_sprzetu')
+    else:
+        form = SprzetForm()
+    return render(request, 'zgloszenia/sprzet_form.html', {'form': form, 'tytul': 'Dodaj Sprzęt'})
+
+@staff_member_required
+def edytuj_sprzet(request, pk):
+    sprzet = get_object_or_404(Sprzet, pk=pk)
+    if request.method == 'POST':
+        form = SprzetForm(request.POST, instance=sprzet)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Zaktualizowano dane urządzenia.")
+            return redirect('lista_sprzetu')
+    else:
+        form = SprzetForm(instance=sprzet)
+    return render(request, 'zgloszenia/sprzet_form.html', {'form': form, 'tytul': 'Edytuj Sprzęt'})
+
+@staff_member_required
+def usun_sprzet(request, pk):
+    sprzet = get_object_or_404(Sprzet, pk=pk)
+    sprzet.delete()
+    messages.success(request, "Urządzenie zostało usunięte.")
+    return redirect('lista_sprzetu')

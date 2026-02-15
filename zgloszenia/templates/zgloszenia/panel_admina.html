@@ -44,7 +44,13 @@
     <tbody>
         {% for z in zgloszenia %}
         <tr>
-            <td>{{ z.autor.username }}</td>
+            <tr>
+    <td>{{ z.autor.username }}</td>
+        <td>
+            <a href="{% url 'szczegoly_zgloszenia' z.pk %}" class="fw-bold text-decoration-none text-dark">
+                {{ z.tytul }}
+            </a>
+        </td>
             <td>{{ z.tytul }}</td>
             <td>
                 <span class="badge 
