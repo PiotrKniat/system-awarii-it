@@ -26,6 +26,22 @@
                         <span class="badge bg-secondary">Nieprzydzielone</span>
                     {% endif %}
                 </p>
+                <p><strong>Priorytet:</strong> 
+                    <span class="badge {% if zgloszenie.priorytet == 'wysoki' %}bg-danger{% else %}bg-info{% endif %}">
+                        {{ zgloszenie.get_priorytet_display }}
+                    </span>
+                </p>
+                <p><strong>SLA:</strong> 
+                    {% with sla_status=zgloszenie.get_sla_status %}
+                    <span class="badge {% if sla_status == 'on_track' %}bg-success{% elif sla_status == 'at_risk' %}bg-warning text-dark{% elif sla_status == 'breached' %}bg-danger{% else %}bg-info{% endif %}">
+                        {{ zgloszenie.get_sla_status_display }}
+                    </span>
+                    <br><small class="text-muted">Termin: {{ zgloszenie.sla_deadline|date:"d.m.Y H:i" }}</small>
+                    {% if zgloszenie.status != 'zamkniete' %}
+                        <br><small class="text-muted">Pozostało: {{ zgloszenie.get_time_remaining }}</small>
+                    {% endif %}
+                    {% endwith %}
+                </p>
                 <p><strong>Opis:</strong><br>{{ zgloszenie.opis }}</p>
                     {% if zgloszenie.screenshot %}
                         <hr>

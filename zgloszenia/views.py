@@ -32,6 +32,7 @@ def panel_administratora(request):
     
     wybrany_status = request.GET.get('status', '')
     szukana_fraza = request.GET.get('q', '')
+    wybrany_sla = request.GET.get('sla', '')
     
     if wybrany_status:
         zgloszenia = zgloszenia.filter(status=wybrany_status)
@@ -41,11 +42,19 @@ def panel_administratora(request):
             Q(tytul__icontains=szukana_fraza) | 
             Q(opis__icontains=szukana_fraza)
         )
+    
+    if wybrany_sla == 'breached':
+        zgloszenia = [z for z in zgloszenia if z.get_sla_status() == 'breached']
+    elif wybrany_sla == 'at_risk':
+        zgloszenia = [z for z in zgloszenia if z.get_sla_status() == 'at_risk']
+    elif wybrany_sla == 'on_track':
+        zgloszenia = [z for z in zgloszenia if z.get_sla_status() == 'on_track']
 
     context = {
         'zgloszenia': zgloszenia,
         'wybrany_status': wybrany_status,
         'szukana_fraza': szukana_fraza,
+        'wybrany_sla': wybrany_sla,
     }
     return render(request, 'zgloszenia/panel_admina.html', context)
 
@@ -86,6 +95,7 @@ def moje_przydzielone_zgloszenia(request):
     
     wybrany_status = request.GET.get('status', '')
     szukana_fraza = request.GET.get('q', '')
+    wybrany_sla = request.GET.get('sla', '')
     
     if wybrany_status:
         zgloszenia = zgloszenia.filter(status=wybrany_status)
@@ -95,11 +105,19 @@ def moje_przydzielone_zgloszenia(request):
             Q(tytul__icontains=szukana_fraza) | 
             Q(opis__icontains=szukana_fraza)
         )
+    
+    if wybrany_sla == 'breached':
+        zgloszenia = [z for z in zgloszenia if z.get_sla_status() == 'breached']
+    elif wybrany_sla == 'at_risk':
+        zgloszenia = [z for z in zgloszenia if z.get_sla_status() == 'at_risk']
+    elif wybrany_sla == 'on_track':
+        zgloszenia = [z for z in zgloszenia if z.get_sla_status() == 'on_track']
 
     context = {
         'zgloszenia': zgloszenia,
         'wybrany_status': wybrany_status,
         'szukana_fraza': szukana_fraza,
+        'wybrany_sla': wybrany_sla,
     }
     return render(request, 'zgloszenia/moje_przydzielone.html', context)
 

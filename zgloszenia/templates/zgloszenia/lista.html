@@ -15,6 +15,8 @@
             <th>Kategoria</th>
             <th>Priorytet</th>
             <th>Status</th>
+            <th>SLA</th>
+            <th>Pozostało</th>
             <th>Data</th>
             <th>Akcje</th> 
         </tr>
@@ -36,6 +38,20 @@
             <td> 
                 <span class="badge bg-secondary">{{ z.get_status_display }}</span>
             </td>
+            <td>
+                {% with sla_status=z.get_sla_status %}
+                <span class="badge {% if sla_status == 'on_track' %}bg-success{% elif sla_status == 'at_risk' %}bg-warning text-dark{% elif sla_status == 'breached' %}bg-danger{% else %}bg-info{% endif %}">
+                    {{ z.get_sla_status_display }}
+                </span>
+                {% endwith %}
+            </td>
+            <td>
+                {% if z.status != 'zamkniete' %}
+                    <small class="text-muted">{{ z.get_time_remaining }}</small>
+                {% else %}
+                    <small class="text-muted">-</small>
+                {% endif %}
+            </td>
             <td> {{ z.data_utworzenia|date:"d.m.Y H:i" }}
             </td>
             <td> 
@@ -47,7 +63,7 @@
         </tr>
         {% empty %}
         <tr>
-            <td colspan="6" class="text-center text-muted p-4">Nie masz jeszcze żadnych zgłoszeń.</td>
+            <td colspan="8" class="text-center text-muted p-4">Nie masz jeszcze żadnych zgłoszeń.</td>
         </tr>
         {% endfor %}
     </tbody>

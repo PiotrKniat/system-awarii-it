@@ -5,7 +5,7 @@
     <div class="col-md-7">
         <h2>Moje Przydzielone Zgłoszenia</h2>
         <label class="form-label fw-bold">Filtruj status:</label>
-        <div class="btn-group d-flex shadow-sm">
+        <div class="btn-group d-flex shadow-sm" style="flex-wrap: wrap;">
             <a href="?status=&q={{ szukana_fraza }}" 
                class="btn btn-outline-secondary {% if not wybrany_status %}active{% endif %}">Wszystkie</a>
             
@@ -19,10 +19,29 @@
                class="btn btn-outline-success {% if wybrany_status == 'zamkniete' %}active{% endif %}">Zamknięte</a>
         </div>
     </div>
-
     <div class="col-md-5">
+        <label class="form-label fw-bold">Filtruj SLA:</label>
+        <div class="btn-group d-flex shadow-sm" style="flex-wrap: wrap;">
+            <a href="?status={{ wybrany_status }}&q={{ szukana_fraza }}" 
+               class="btn btn-outline-secondary {% if not wybrany_sla %}active{% endif %}">Wszystkie</a>
+            
+            <a href="?status={{ wybrany_status }}&sla=breached&q={{ szukana_fraza }}" 
+               class="btn btn-outline-danger {% if wybrany_sla == 'breached' %}active{% endif %}">⚠ Przekroczone</a>
+            
+            <a href="?status={{ wybrany_status }}&sla=at_risk&q={{ szukana_fraza }}" 
+               class="btn btn-outline-warning {% if wybrany_sla == 'at_risk' %}active{% endif %}">⚡ Zagrożenie</a>
+            
+            <a href="?status={{ wybrany_status }}&sla=on_track&q={{ szukana_fraza }}" 
+               class="btn btn-outline-success {% if wybrany_sla == 'on_track' %}active{% endif %}">✓ W trakcie</a>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-md-12">
         <form method="get" class="d-flex">
             <input type="hidden" name="status" value="{{ wybrany_status }}">
+            <input type="hidden" name="sla" value="{{ wybrany_sla }}">
             <div class="input-group">
                 <input type="text" name="q" class="form-control" placeholder="Szukaj..." value="{{ szukana_fraza }}">
                 <button class="btn btn-dark" type="submit">Szukaj</button>
@@ -39,6 +58,8 @@
             <th>Temat</th>
             <th>Status</th>
             <th>Priorytet</th>
+            <th>SLA</th>
+            <th>Pozostało</th>
             <th>Data utworzenia</th>
             <th>Akcje</th>
         </tr>
@@ -63,6 +84,20 @@
                     {{ z.get_priorytet_display }}
                 </span>
             </td>
+            <td>
+                {% with sla_status=z.get_sla_status %}
+                <span class="badge {% if sla_status == 'on_track' %}bg-success{% elif sla_status == 'at_risk' %}bg-warning text-dark{% elif sla_status == 'breached' %}bg-danger{% else %}bg-info{% endif %}">
+                    {{ z.get_sla_status_display }}
+                </span>
+                {% endwith %}
+            </td>
+            <td>
+                {% if z.status != 'zamkniete' %}
+                    <small class="text-muted">{{ z.get_time_remaining }}</small>
+                {% else %}
+                    <small class="text-muted">-</small>
+                {% endif %}
+            </td>
             <td>{{ z.data_utworzenia|date:"d.m.Y H:i" }}</td>
             <td>
                 <div class="btn-group btn-group-sm" role="group">
@@ -78,8 +113,7 @@
         </tr>
         {% empty %}
         <tr>
-            <td colspan="6" class="text-center text-muted p-4">
-                Brak przydzielonych zgłoszeń spełniających kryteria.
+            <td colspan="8" class="text-center text-muted p-4">                Brak przydzielonych zgłoszeń spełniających kryteria.
             </td>
         </tr>
         {% endfor %}
