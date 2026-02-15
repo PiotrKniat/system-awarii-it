@@ -10,9 +10,18 @@
                     <h3 class="card-title mb-0">Formularz Zgłoszenia</h3>
                 </div>
                 <div class="card-body">
-                    <form method="post">
+                    <form method="post" enctype="multipart/form-data">
                         {% csrf_token %}
                         {{ form.as_p }}
+                        <p><strong>Opis:</strong><br>{{ zgloszenie.opis }}</p>
+                        {% if zgloszenie.screenshot %}
+                            <hr>
+                            <p><strong>Załączony zrzut ekranu:</strong></p>
+                            <a href="{{ zgloszenie.screenshot.url }}" target="_blank">
+                                <img src="{{ zgloszenie.screenshot.url }}" alt="Screenshot błędu" class="img-fluid img-thumbnail" style="max-height: 300px;">
+                            </a>
+                        {% endif %}
+                        <hr>
                         <div class="mt-4">
                             <button type="submit" class="btn btn-primary">Wyślij do IT</button>
                             <a href="{% url 'lista_zgloszen' %}" class="btn btn-link text-secondary">Powrót</a>

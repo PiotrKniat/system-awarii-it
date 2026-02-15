@@ -3,7 +3,8 @@ from django.http import HttpResponseForbidden
 from .models import Zgloszenie, Komentarz, Sprzet
 from .forms import KomentarzForm, ZgloszenieForm, SprzetForm
 from django.contrib.auth.models import User
-from django.contrib.auth.decorators import login_required, user_passes_test, staff_member_required
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
 

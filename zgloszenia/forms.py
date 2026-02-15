@@ -4,7 +4,7 @@ from .models import Komentarz, Zgloszenie, Sprzet
 class ZgloszenieForm(forms.ModelForm):
     class Meta:
         model = Zgloszenie
-        fields = ['tytul', 'urzadzenie', 'kategoria', 'opis', 'priorytet']
+        fields = ['tytul', 'urzadzenie', 'kategoria', 'opis', 'priorytet', 'screenshot']
 
         def __init__(self, *args, **kwargs):
             user = kwargs.pop('user', None)
@@ -12,6 +12,7 @@ class ZgloszenieForm(forms.ModelForm):
             if user:
                 self.fields['urzadzenie'].queryset = Sprzet.objects.filter(wlasciciel=user)
                 self.fields['urzadzenie'].empty_label = "--- Wybierz sprzęt (opcjonalnie) ---"
+                self.fields['screenshot'].widget.attrs.update({'class': 'form-control'})
 
             for field in self.fields.values():
                 field.widget.attrs.update({'class': 'form-control'})

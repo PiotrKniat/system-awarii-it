@@ -36,6 +36,7 @@ class Zgloszenie(models.Model):
     data_utworzenia = models.DateTimeField(auto_now_add=True)
     autor = models.ForeignKey(User, on_delete=models.CASCADE)
     urzadzenie = models.ForeignKey(Sprzet, on_delete=models.SET_NULL, null=True, blank=True)
+    screenshot = models.ImageField(upload_to='screenshoty/', null=True, blank=True, verbose_name="Zrzut ekranu (opcjonalnie)")
 
 class Komentarz(models.Model):
     zgloszenie = models.ForeignKey(Zgloszenie, on_delete=models.CASCADE, related_name='komentarze')
