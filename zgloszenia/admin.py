@@ -9,9 +9,10 @@ class SprzetAdmin(admin.ModelAdmin):
 
 @admin.register(Zgloszenie)
 class ZgloszenieAdmin(admin.ModelAdmin):
-    list_display = ('tytul', 'autor', 'urzadzenie', 'priorytet', 'status', 'data_utworzenia')
-    list_filter = ('status', 'kategoria', 'priorytet')
+    list_display = ('tytul', 'autor', 'assigned_to', 'urzadzenie', 'priorytet', 'status', 'data_utworzenia')
+    list_filter = ('status', 'kategoria', 'priorytet', 'assigned_to')
     search_fields = ('tytul', 'opis')
+    readonly_fields = ('data_utworzenia', 'autor')
 
 @admin.register(Komentarz)
 class KomentarzAdmin(admin.ModelAdmin):

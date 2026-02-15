@@ -3,6 +3,7 @@
 {% block content %}
 <div class="row align-items-end mb-4">
     <div class="col-md-7">
+        <h2>Moje Przydzielone Zgłoszenia</h2>
         <label class="form-label fw-bold">Filtruj status:</label>
         <div class="btn-group d-flex shadow-sm">
             <a href="?status=&q={{ szukana_fraza }}" 
@@ -25,7 +26,7 @@
             <div class="input-group">
                 <input type="text" name="q" class="form-control" placeholder="Szukaj..." value="{{ szukana_fraza }}">
                 <button class="btn btn-dark" type="submit">Szukaj</button>
-                <a href="{% url 'panel_administratora' %}" class="btn btn-outline-danger">X</a>
+                <a href="{% url 'moje_przydzielone_zgloszenia' %}" class="btn btn-outline-danger">X</a>
             </div>
         </form>
     </div>
@@ -36,9 +37,9 @@
         <tr>
             <th>Autor</th>
             <th>Temat</th>
-            <th>Przydzielono do</th>
             <th>Status</th>
             <th>Priorytet</th>
+            <th>Data utworzenia</th>
             <th>Akcje</th>
         </tr>
     </thead>
@@ -52,13 +53,6 @@
                 </a>
             </td>
             <td>
-                {% if z.assigned_to %}
-                    <span class="badge bg-info">{{ z.assigned_to.username }}</span>
-                {% else %}
-                    <span class="badge bg-secondary">Nieprzydzielone</span>
-                {% endif %}
-            </td>
-            <td>
                 <span class="badge 
                     {% if z.status == 'nowe' %}bg-primary{% elif z.status == 'w_trakcie' %}bg-warning{% else %}bg-success{% endif %}">
                     {{ z.get_status_display }}
@@ -69,19 +63,24 @@
                     {{ z.get_priorytet_display }}
                 </span>
             </td>
+            <td>{{ z.data_utworzenia|date:"d.m.Y H:i" }}</td>
             <td>
                 <div class="btn-group btn-group-sm" role="group">
-                    <a href="{% url 'przydziel_zgloszenie' z.pk %}" class="btn btn-outline-info">Przydziel</a>
-                    <a href="{% url 'zmien_status' z.pk 'w_trakcie' %}" class="btn btn-outline-warning">W trakcie</a>
-                    <a href="{% url 'zmien_status' z.pk 'zamkniete' %}" class="btn btn-outline-success">Zamknij</a>
-                    <a href="{% url 'usun_zgloszenie' z.pk %}" class="btn btn-outline-danger" 
-                        onclick="return confirm('Czy na pewno chcesz trwale usunąć to zgłoszenie?')">Usuń</a>
+                    <a href="{% url 'szczegoly_zgloszenia' z.pk %}" class="btn btn-outline-primary">Szczegóły</a>
+                    <a href="{% url 'zmien_status' z.pk 'w_trakcie' %}" 
+                       class="btn btn-outline-warning"
+                       {% if z.status == 'w_trakcie' %}disabled{% endif %}>W trakcie</a>
+                    <a href="{% url 'zmien_status' z.pk 'zamkniete' %}" 
+                       class="btn btn-outline-success"
+                       {% if z.status == 'zamkniete' %}disabled{% endif %}>Zamknij</a>
                 </div>
             </td>
         </tr>
         {% empty %}
         <tr>
-            <td colspan="6" class="text-center text-muted p-4">Brak zgłoszeń spełniających kryteria.</td>
+            <td colspan="6" class="text-center text-muted p-4">
+                Brak przydzielonych zgłoszeń spełniających kryteria.
+            </td>
         </tr>
         {% endfor %}
     </tbody>

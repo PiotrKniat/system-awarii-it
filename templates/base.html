@@ -18,8 +18,9 @@
                         <li class="nav-item"><a class="nav-link" href="{% url 'nowe_zgloszenie' %}">Zgłoś Awarię</a></li>
                     {% endif %}
                     {% if user.is_staff %}
+                        <li class="nav-item"><a class="nav-link fw-bold" href="{% url 'moje_przydzielone_zgloszenia' %}">MOJE ZGŁOSZENIA</a></li>
                         <li class="nav-item"><a class="nav-link fw-bold" href="{% url 'lista_sprzetu' %}">SPRZĘT</a></li>
-            <li class="nav-item"><a class="nav-link text-warning fw-bold" href="{% url 'panel_administratora' %}">ZGŁOSZENIA (ADMIN)</a></li>
+                        <li class="nav-item"><a class="nav-link text-warning fw-bold" href="{% url 'panel_administratora' %}">WSZYSTKIE (ADMIN)</a></li>
                     {% endif %}
                 {% endif %}
             </ul>

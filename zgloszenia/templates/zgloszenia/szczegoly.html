@@ -19,7 +19,23 @@
                         <span class="text-muted">Brak</span>
                     {% endif %}
                 </p>
+                <p><strong>Przydzielono do:</strong> 
+                    {% if zgloszenie.assigned_to %}
+                        <span class="badge bg-info">{{ zgloszenie.assigned_to.username }}</span>
+                    {% else %}
+                        <span class="badge bg-secondary">Nieprzydzielone</span>
+                    {% endif %}
+                </p>
                 <p><strong>Opis:</strong><br>{{ zgloszenie.opis }}</p>
+                    {% if zgloszenie.screenshot %}
+                        <hr>
+                        <div class="mt-3">
+                            <h5>Załączony zrzut ekranu:</h5>
+                            <a href="{{ zgloszenie.screenshot.url }}" target="_blank">
+                                <img src="{{ zgloszenie.screenshot.url }}" alt="Screenshot awarii" class="img-fluid img-thumbnail shadow-sm" style="max-height: 400px;">
+                            </a>
+                        </div>
+                    {% endif %}
                 <hr>
                 <a href="{% url 'lista_zgloszen' %}" class="btn btn-outline-secondary w-100">Wróć do listy</a>
             </div>

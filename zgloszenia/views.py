@@ -1,14 +1,13 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponseForbidden
+from django.db.models import Q
 from .models import Zgloszenie, Komentarz, Sprzet
-from .forms import KomentarzForm, ZgloszenieForm, SprzetForm
+from .forms import KomentarzForm, ZgloszenieForm, SprzetForm, ZgloszenieAssignmentForm
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
-
-from zgloszenia import models
 
 def rejestracja(request):
     if request.method == "POST":
@@ -39,8 +38,8 @@ def panel_administratora(request):
         
     if szukana_fraza:
         zgloszenia = zgloszenia.filter(
-            models.Q(tytul__icontains=szukana_fraza) | 
-            models.Q(opis__icontains=szukana_fraza)
+            Q(tytul__icontains=szukana_fraza) | 
+            Q(opis__icontains=szukana_fraza)
         )
 
     context = {
@@ -60,24 +59,49 @@ def zmien_status(request, pk, nowy_status):
     return redirect('panel_administratora')
 
 @login_required
-def lista_zgloszen(request):
-    zgloszenia = Zgloszenie.objects.all().order_by('-data_utworzenia')
-    return render(request, 'zgloszenia/lista.html', {'zgloszenia': zgloszenia})
+@user_passes_test(czy_admin)
+def przydziel_zgloszenie(request, pk):
+    zgloszenie = get_object_or_404(Zgloszenie, pk=pk)
+    
+    if request.method == 'POST':
+        form = ZgloszenieAssignmentForm(request.POST, instance=zgloszenie)
+        if form.is_valid():
+            assigned_to = form.cleaned_data.get('assigned_to')
+            form.save()
+            if assigned_to:
+                messages.success(request, f"Zgłoszenie '{zgloszenie.tytul}' przydzielono użytkownikowi {assigned_to.username}.")
+            else:
+                messages.success(request, f"Usunięto przydzielenie zgłoszenia '{zgloszenie.tytul}'.")
+            return redirect('panel_administratora')
+    else:
+        form = ZgloszenieAssignmentForm(instance=zgloszenie)
+    
+    return render(request, 'zgloszenia/przydziel.html', {'form': form, 'zgloszenie': zgloszenie})
 
 @login_required
-def nowe_zgloszenie(request):
-    if request.method == "POST":
-        form = ZgloszenieForm(request.POST, user=request.user)
-        if form.is_valid():
-            zgloszenie = form.save(commit=False)
-            zgloszenie.autor = request.user
-            zgloszenie.save()
-            messages.success(request, "Zgłoszenie zostało dodane!")
-            return redirect('lista_zgloszen')
-    else:
-        form = ZgloszenieForm(user=request.user)
+@user_passes_test(czy_admin)
+def moje_przydzielone_zgloszenia(request):
+    """Wyświetla zgłoszenia przydzielone do aktualnego użytkownika IT"""
+    zgloszenia = Zgloszenie.objects.filter(assigned_to=request.user).order_by('-data_utworzenia')
     
-    return render(request, 'zgloszenia/formularz.html', {'form': form})
+    wybrany_status = request.GET.get('status', '')
+    szukana_fraza = request.GET.get('q', '')
+    
+    if wybrany_status:
+        zgloszenia = zgloszenia.filter(status=wybrany_status)
+        
+    if szukana_fraza:
+        zgloszenia = zgloszenia.filter(
+            Q(tytul__icontains=szukana_fraza) | 
+            Q(opis__icontains=szukana_fraza)
+        )
+
+    context = {
+        'zgloszenia': zgloszenia,
+        'wybrany_status': wybrany_status,
+        'szukana_fraza': szukana_fraza,
+    }
+    return render(request, 'zgloszenia/moje_przydzielone.html', context)
 
 @login_required
 def lista_zgloszen(request):
@@ -86,12 +110,18 @@ def lista_zgloszen(request):
 
 @login_required
 def nowe_zgloszenie(request):
-    form = ZgloszenieForm(request.POST or None)
-    if request.method == "POST" and form.is_valid():
-        zgloszenie = form.save(commit=False)
-        zgloszenie.autor = request.user
-        zgloszenie.save()
-        return redirect('lista_zgloszen')
+    if request.method == 'POST':
+        form = ZgloszenieForm(request.POST, request.FILES, user=request.user)
+        
+        if form.is_valid():
+            zgloszenie = form.save(commit=False)
+            zgloszenie.autor = request.user
+            zgloszenie.save()
+            messages.success(request, 'Zgłoszenie zostało wysłane!')
+            return redirect('lista_zgloszen')
+    else:
+        form = ZgloszenieForm(user=request.user)
+        
     return render(request, 'zgloszenia/formularz.html', {'form': form})
 
 @login_required
